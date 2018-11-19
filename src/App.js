@@ -92,8 +92,8 @@ class App extends Component {
     this.state.state === states.TIMING || this.state.state === states.PAUSED ? (
       <div className="buttonSpacer" />
     ) : (
-      buttons
-    )
+        buttons
+      )
 
   upButtons = () =>
     this.wrapButtons(
@@ -147,8 +147,8 @@ class App extends Component {
         this.isIdle()
           ? this.startTimer
           : this.isPaused()
-          ? this.resumeTimer
-          : this.pauseTimer
+            ? this.resumeTimer
+            : this.pauseTimer
       }
     >
       {this.isTiming() ? '❚❚' : '▶'}
@@ -157,7 +157,7 @@ class App extends Component {
 
   restartButton = disabled => (
     <button className="resetButton" onClick={this.reset} disabled={disabled}>
-      ⯀
+      ■
     </button>
   )
 
