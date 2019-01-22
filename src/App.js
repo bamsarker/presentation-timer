@@ -16,11 +16,24 @@ class App extends Component {
     timing: false,
     startTime: undefined,
     totalTime: 5 * 60 * 1000,
-    timeRemaining: undefined
+    timeRemaining: undefined,
+    pauseIntervals: []
   }
 
-  calculateTimeRemaining = (start, total) => {
-    const rem = total - (Date.now() - start)
+  componentDidMount() {
+    document.addEventListener('keydown', event => {
+      if (event.code === 'Space') {
+        this.isIdle()
+          ? this.startTimer()
+          : this.isPaused()
+            ? this.resumeTimer()
+            : this.pauseTimer()
+      }
+    })
+  }
+
+  calculateTimeRemaining = (start, total, pauseTime) => {
+    const rem = total - (Date.now() - start) + pauseTime
     return rem < 0 ? 0 : rem
   }
 
@@ -29,7 +42,8 @@ class App extends Component {
       {
         timeRemaining: this.calculateTimeRemaining(
           this.state.startTime,
-          this.state.totalTime
+          this.state.totalTime,
+          this.state.pauseIntervals.reduce((total, interval) => total + ((interval.end || interval.start) - interval.start), 0)
         )
       },
       () => {
@@ -56,21 +70,28 @@ class App extends Component {
 
   resumeTimer = () => {
     this.setState({
-      state: states.TIMING
+      state: states.TIMING,
+      pauseIntervals: this.state.pauseIntervals.map((interval, i) => {
+        if (i < this.state.pauseIntervals.length - 1) return interval
+        interval.end = Date.now()
+        return interval
+      })
     })
     requestAnimationFrame(this.updateTimer)
   }
 
   pauseTimer = () => {
     this.setState({
-      state: states.PAUSED
+      state: states.PAUSED,
+      pauseIntervals: [...this.state.pauseIntervals, { start: Date.now() }]
     })
   }
 
   reset = () => {
     this.setState({
       state: states.IDLE,
-      timeRemaining: this.state.totalTime
+      timeRemaining: this.state.totalTime,
+      pauseIntervals: []
     })
   }
 
